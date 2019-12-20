@@ -9,6 +9,8 @@ This Serverless Application is publicly available at the ARN:
 
 If you would like to fork and host the serverless honeycomb publisher privately this repo also contains the AWS Code Pipeline definition necessary for this, the details are in the [Deployment](#deployment) guide and make use of the AWS Labs provided [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd)
 
+![Simple Publishing Diagram](https://github.com/stax-labs/serverless-honeycomb-publisher/raw/master/images/simple-publishing-diagram.png)
+
 ## Purpose (Why?)
 
 
@@ -83,9 +85,9 @@ These steps are only required if you would like to host the application in your 
     * GitHubOAuthTokenSecretId (in our case this is the path to a secret in AWS Secrets Manager)
 1. Run the make target deployci; you will need an active AWS session with the appropriate permissions for this deployment.
 
-```bash
-$ make deployci
-```
+    ```bash
+    $ make deployci
+    ```
 
 ## License
 
@@ -95,4 +97,4 @@ This application was released under the Apache 2.0 license.
 
 This project is sponsored by [Stax](https://stax.io), a dedicated platform to accelerate your cloud journey.
 
-![Stax Logo](./stax-logo.png)
+![Stax Logo](https://github.com/stax-labs/serverless-honeycomb-publisher/raw/master/images/stax-logo.png)
