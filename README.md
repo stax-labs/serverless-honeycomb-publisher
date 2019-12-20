@@ -40,7 +40,7 @@ HoneycombPublisher:
         "Properties": {
             "Location": {
                 "ApplicationId": "arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher",
-                "SemanticVersion": 0.0.2
+                "SemanticVersion": "0.0.2"
             },
             "Parameters": {
                 "HoneycombDataset": "<YOURDATASET>",
