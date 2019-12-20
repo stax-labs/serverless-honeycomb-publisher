@@ -1,13 +1,15 @@
 # Serverless Honeycomb Publisher
 
-This repo extends the agentless publisher provided by Honeycomb in their [agentless-integrations-for-aws](https://github.com/honeycombio/agentless-integrations-for-aws) by uploading the go binary and SAM template to Amazons AWS Serverless Application Repository for use in Cloudformation Templates.
+This repo extends the agentless publisher provided by [Honeycomb](https://www.honeycomb.io/) in their [agentless-integrations-for-aws](https://github.com/honeycombio/agentless-integrations-for-aws) by uploading the go binary and SAM template to Amazons AWS Serverless Application Repository for use in CloudFormation Templates.
 
-If you would like to use this application in yoru cloudformation see the [Usage](#usage) section of this README for details on how.
+If you would like to use this application in your CloudFormation see the [Usage](#usage) section of this README for details on how.
 
-This Serverless Application is publicly available.
+This Serverless Application is publicly available at the ARN: 
+* `arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher`
 
-If you would like to fork and host the serverless honeycomb publisher privately this repo also contains the AWS Code Pipeline code necessary for this, and the details are included in the [Deployment](#deployment) guide, this code makes use of the AWS Labs provided [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd)
-## Purpose
+If you would like to fork and host the serverless honeycomb publisher privately this repo also contains the AWS Code Pipeline definition necessary for this, the details are in the [Deployment](#deployment) guide and make use of the AWS Labs provided [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd)
+
+## Purpose (Why?)
 
 
 
@@ -41,10 +43,10 @@ HoneycombPublisher:
                 "SemanticVersion": 0.0.2
             },
             "Parameters": {
-                "HoneycombDataset": <YOURDATASET>,
-                "HoneycombWriteKey": <YOURWRITEKEY>,
+                "HoneycombDataset": "<YOURDATASET>",
+                "HoneycombWriteKey": "<YOURWRITEKEY>",
                 "FilterPattern": "",
-                "LogGroupName": "",
+                "LogGroupName": "<YOURLOGGROUP>",
             }
         }
     }
@@ -71,7 +73,7 @@ These steps are only required if you would like to host the application in your 
 ### Requirements
 
 * AWS Account (Application must be deployed in us-east-1 if you intend to share it publicly)
-* A fork of this repository in Github (other SCM tools may be supported by [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd) but are beyond the scope of this readme)
+* A fork of this repository in Github (other SCM tools are supported by [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd) but are beyond the scope of this readme)
 * A PAT token used by AWS CodeBuild to connect to Github
 
 ### Steps
@@ -79,7 +81,7 @@ These steps are only required if you would like to host the application in your 
 1. Update the Makefile to specify your own:
     * S3 Bucket
     * GitHubOAuthTokenSecretId (in our case this is the path to a secret in AWS Secrets Manager)
-1. Run the make target deployci, you will need an active AWS session with the appropriate permissions for this deployment.
+1. Run the make target deployci; you will need an active AWS session with the appropriate permissions for this deployment.
 
 ```bash
 $ make deployci
@@ -87,7 +89,7 @@ $ make deployci
 
 ## License
 
-This application is released under the Apache 2.0 license.
+This application was released under the Apache 2.0 license.
 
 ## Sponsor
 
