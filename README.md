@@ -26,7 +26,7 @@ HoneycombPublisher:
     Properties:
     Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher
-        SemanticVersion: 0.0.2
+        SemanticVersion: 1.0.0
     Parameters:
         HoneycombWriteKey: <YOURKEY>
         HoneycombDataset: <YOURDATASET>
@@ -42,7 +42,7 @@ HoneycombPublisher:
         "Properties": {
             "Location": {
                 "ApplicationId": "arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher",
-                "SemanticVersion": "0.0.2"
+                "SemanticVersion": "1.0.0"
             },
             "Parameters": {
                 "HoneycombDataset": "<YOURDATASET>",
