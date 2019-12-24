@@ -9,11 +9,17 @@ This Serverless Application is publicly available at the ARN:
 
 If you would like to fork and host the serverless honeycomb publisher privately this repo also contains the AWS Code Pipeline definition necessary for this, the details are in the [Deployment](#deployment) guide and make use of the AWS Labs provided [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd)
 
-![Simple Publishing Diagram](https://github.com/stax-labs/serverless-honeycomb-publisher/raw/master/images/simple-publishing-diagram.png)
-
 ## Purpose (Why?)
 
+The agentless-honeycomb-publisher works really well for our use-case, allowing us to write logs to STDOUT then pick them up asyncronously from CloudWatch Logs, however Stax runs lambda functions in many AWS Accounts and AWS Regions, so rather than deal with creating even more pipelines and code to roll out publishers into each environment, when all we really want is the publisher itself we figured why not host it in the AWS Serverless Repo and deploy "once".
 
+[Serverless Agentless Honeycomb Publisher](https://serverlessrepo.aws.amazon.com/applications/arn:aws:serverlessrepo:us-east-1:541595141780:applications~serverless-agentless-honeycomb-publisher)
+
+Then we figured if we were going to maintain this for ourselves, why not share it so others can either use the publisher from the SAR directly, or build their own pipeline.
+
+![Simple Publishing Diagram](https://github.com/stax-labs/serverless-honeycomb-publisher/raw/master/images/simple-publishing-diagram.png)
+
+This also allows us to extend upon the functionality in the Publisher.
 
 ## Usage
 
