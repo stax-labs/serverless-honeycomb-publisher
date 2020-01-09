@@ -4,7 +4,7 @@ This repo extends the agentless publisher provided by [Honeycomb](https://www.ho
 
 If you would like to use this application in your CloudFormation see the [Usage](#usage) section of this README for details on how.
 
-This Serverless Application is publicly available at the ARN: 
+This Serverless Application is publicly available at the ARN:
 * `arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher`
 
 If you would like to fork and host the serverless honeycomb publisher privately this repo also contains the AWS Code Pipeline definition necessary for this, the details are in the [Deployment](#deployment) guide and make use of the AWS Labs provided [aws-sam-codepipeline-cd](https://github.com/awslabs/aws-sam-codepipeline-cd)
@@ -73,6 +73,12 @@ As well as the KMS KeyID for decrpytion of your token:
 
 And the Honeycomb API Host:
 * HoneycombAPIHost
+
+## Lambda and Cloudwatch Logs
+
+We have implemented a solution to avoid the situation where a lambda is deployed but the associated log group has not been created _yet_, which results in a failure when attaching the log filter used by the publisher. To avoid this for lambdas which haven't been invoked yet we attempt to create the log group.
+
+**Note:** This means on deployment of this stack log group(s) supplied which don't exist yet will be created by this application.
 
 ## Deployment
 

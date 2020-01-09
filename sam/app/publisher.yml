@@ -4,7 +4,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 
 Metadata:
   'AWS::CloudFormation::Interface':
-    ParameterGroups:  
+    ParameterGroups:
       - Label:
           default: 'Honeycomb Monitoring Parameters'
         Parameters:
@@ -30,7 +30,7 @@ Metadata:
     SpdxLicenseId: Apache-2.0
     Labels: [honeycomb, sam, serverless, publisher, trace]
     HomePageUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
-    SemanticVersion: 1.0.0
+    SemanticVersion: 1.0.1
     SourceCodeUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
     LicenseUrl: ../../LICENSE
     ReadmeUrl: ../../README.md
@@ -86,6 +86,65 @@ Conditions:
   LogGroup4Enabled: !Not [!Equals [!Ref LogGroupName4, '']]
   LogGroup5Enabled: !Not [!Equals [!Ref LogGroupName5, '']]
 Resources:
+  CWLogsLambdaHandler:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: '../../dist/handler.zip'
+      Description: Lambda function for creating log groups from cloudformation
+      Handler: cwlog-creator
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+              Resource: "arn:aws:logs:*:*:*"
+      MemorySize: 128
+      Runtime: go1.x
+      Timeout: 10
+  LogGroupCreate:
+    Type: "Custom::LogGroupCreate"
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName
+  LogGroupCreate1:
+    Type: "Custom::LogGroupCreate"
+    Condition: LogGroup1Enabled
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName1
+  LogGroupCreate2:
+    Type: "Custom::LogGroupCreate"
+    Condition: LogGroup2Enabled
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName2
+  LogGroupCreate3:
+    Type: "Custom::LogGroupCreate"
+    Condition: LogGroup3Enabled
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName3
+  LogGroupCreate4:
+    Type: "Custom::LogGroupCreate"
+    Condition: LogGroup4Enabled
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName4
+  LogGroupCreate5:
+    Type: "Custom::LogGroupCreate"
+    Condition: LogGroup5Enabled
+    Version: "1.0"
+    Properties:
+      ServiceToken: !Sub "${CWLogsLambdaHandler.Arn}"
+      LogGroupName: !Ref LogGroupName5
   PublisherLambdaHandler:
     Type: "AWS::Serverless::Function"
     Properties:
@@ -123,7 +182,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate]
   # hacky work-around to allow multiple optional inputs for log group name
   # clearly hitting some limitations of the Cloudformation workflow here
   CloudwatchSubscriptionFilter1:
@@ -136,7 +195,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName1
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate1]
   CloudwatchSubscriptionFilter2:
     Type: "AWS::Logs::SubscriptionFilter"
     Condition: LogGroup2Enabled
@@ -147,7 +206,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName2
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate2]
   CloudwatchSubscriptionFilter3:
     Type: "AWS::Logs::SubscriptionFilter"
     Condition: LogGroup3Enabled
@@ -158,7 +217,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName3
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate3]
   CloudwatchSubscriptionFilter4:
     Type: "AWS::Logs::SubscriptionFilter"
     Condition: LogGroup4Enabled
@@ -169,7 +228,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName4
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate4]
   CloudwatchSubscriptionFilter5:
     Type: "AWS::Logs::SubscriptionFilter"
     Condition: LogGroup5Enabled
@@ -180,7 +239,7 @@ Resources:
           - Arn
       LogGroupName: !Ref LogGroupName5
       FilterPattern: !Ref FilterPattern
-    DependsOn: ExecutePermission
+    DependsOn: [ExecutePermission, LogGroupCreate5]
   LambdaIAMRole:
     Type: "AWS::IAM::Role"
     Properties:
