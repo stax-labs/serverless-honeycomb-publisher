@@ -21,10 +21,10 @@ validate-template:
 .PHONY: validate-template
 
 build:
-	$(info [+] Build Publisher")
+	$(info [+] Build Lambda Binaries")
 	@mkdir -p dist
-	@GOOS=linux cd publisher && go build
-	@cp publisher/publisher dist/
+	@GOOS=linux GOARCH=amd64 go build -o dist/publisher ./publisher
+	@GOOS=linux GOARCH=amd64 go build -o dist/cwlog-creator ./cwlog-creator
 .PHONY: build
 
 package:
