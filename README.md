@@ -1,5 +1,8 @@
 # Serverless Honeycomb Publisher
 
+[![GitHub Actions status](https://github.com/stax-labs/serverless-honeycomb-publisher/workflows/Go/badge.svg?branch=master)](https://github.com/stax-labs/serverless-honeycomb-publisher/actions?query=workflow%3AGo)
+[![Go Report Card](https://goreportcard.com/badge/github.com/stax-labs/serverless-honeycomb-publisher)](https://goreportcard.com/report/github.com/stax-labs/serverless-honeycomb-publisher)
+
 This repo extends the agentless publisher provided by [Honeycomb](https://www.honeycomb.io/) in their [agentless-integrations-for-aws](https://github.com/honeycombio/agentless-integrations-for-aws) by uploading the go binary and SAM template to Amazons AWS Serverless Application Repository for use in CloudFormation Templates.
 
 If you would like to use this application in your CloudFormation see the [Usage](#usage) section of this README for details on how.
