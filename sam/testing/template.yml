@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  This template creates both kineses and cloudwatch logs publishers 
+  using serverless-honeycomb-publisher
+
+Parameters:
+
+  Stage:
+    Description: 'Name of the environment which this service is a part, this could be dev/test/prod'
+    Type: String
+    Default: dev    
+
+# Metadata:
+#   'AWS::CloudFormation::Interface':
+#     ParameterGroups:
+#       - Label:
+#           default: 'Honeycomb Monitoring Parameters'
+#         Parameters:
+#         - HoneycombWriteKey
+#         - KMSKeyId
+#         - HoneycombAPIHost
+#         - HoneycombDataset
+#       - Label:
+#           default: 'Log Groups to Monitor'
+#         Parameters:
+#         - LogGroupName
+#         - LogGroupName1
+#         - LogGroupName2
+#         - LogGroupName3
+#         - LogGroupName4
+#         - LogGroupName5
+#         - FilterPattern
+
+Resources:
+
+  ServerlessCWLPublisher:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: '../app/publisher.yml'
+      Parameters:
+        HoneycombWriteKey: !Sub '{{resolve:secretsmanager:/${Stage}/master/honeycomb/events-api-key::::}}'
+        HoneycombDataset: !Ref Stage
+        LogGroupName: "/aws/testing/loggroup"
+
+  LogStream:
+    Type: AWS::Kinesis::Stream
+    Properties: 
+      RetentionPeriodHours: 24
+      ShardCount: 1
+      StreamEncryption:
+          EncryptionType: KMS
+          KeyId: "alias/aws/kinesis"
+                
+  ServerlessKinesisPublisher:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: '../app/publisher.yml'
+      Parameters:
+        HoneycombWriteKey: !Sub '{{resolve:secretsmanager:/${Stage}/master/honeycomb/events-api-key::::}}'
+        HoneycombDataset: !Ref Stage
+        SourceType: Kinesis
+        KinesisStreamArn: !GetAtt LogStream.Arn
+        KinesisStringMatch: "libhoney"

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -25,6 +26,7 @@ var (
 	dataset      string
 	errorDataset string
 	filterFields []string
+	matchString  string
 )
 
 const (
@@ -189,4 +191,47 @@ func GetFilterFields() []string {
 	filterFields = strings.Split(filtersString, ",")
 
 	return filterFields
+}
+
+type Payload struct {
+	Time       time.Time
+	SampleRate uint
+	Dataset    string
+	Data       interface{}
+}
+
+//ExtractPayload takes the string input of a "log" and parses out some key fields.
+func ExtractPayload(data map[string]interface{}) (*Payload, error) {
+	p := &Payload{}
+	_data, ok := data["data"]
+	if !ok {
+		return nil, fmt.Errorf("unable to find data in payload")
+	}
+	if timestamp, ok := data["time"].(string); ok {
+		if parsedTime, err := time.Parse(time.RFC3339, timestamp); err == nil {
+			p.Time = parsedTime
+		}
+	}
+	if dataset, ok := data["dataset"].(string); ok {
+		p.Dataset = dataset
+	}
+	if sampleRate, ok := data["samplerate"].(float64); ok {
+		p.SampleRate = uint(sampleRate)
+	}
+	p.Data = _data
+
+	return p, nil
+}
+
+//GetMatchString returns a string from the environment variable HONEYCOMB_EVENT_MATCH_STRINGS
+//to use to determine HC events from an unfiltered stream
+func GetMatchString() string {
+
+	if matchString != "" {
+		return matchString
+	}
+
+	matchString := os.Getenv("HONEYCOMB_EVENT_MATCH_STRINGS")
+
+	return matchString
 }

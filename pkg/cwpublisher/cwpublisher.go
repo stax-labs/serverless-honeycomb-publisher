@@ -1,16 +1,14 @@
-package main
+package cwpublisher
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/honeycombio/agentless-integrations-for-aws/common"
-	"github.com/sirupsen/logrus"
-
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/honeycombio/honeytail/parsers"
 	"github.com/honeycombio/libhoney-go"
+	"github.com/sirupsen/logrus"
+	"github.com/stax-labs/serverless-honeycomb-publisher/pkg/common"
 )
 
 type payload struct {
@@ -18,28 +16,6 @@ type payload struct {
 	sampleRate uint
 	dataset    string
 	data       interface{}
-}
-
-func extractPayload(data map[string]interface{}) (*payload, error) {
-	p := &payload{}
-	_data, ok := data["data"]
-	if !ok {
-		return nil, fmt.Errorf("unable to find data in payload")
-	}
-	if timestamp, ok := data["time"].(string); ok {
-		if parsedTime, err := time.Parse(time.RFC3339, timestamp); err == nil {
-			p.time = parsedTime
-		}
-	}
-	if dataset, ok := data["dataset"].(string); ok {
-		p.dataset = dataset
-	}
-	if sampleRate, ok := data["samplerate"].(float64); ok {
-		p.sampleRate = uint(sampleRate)
-	}
-	p.data = _data
-
-	return p, nil
 }
 
 // Response is a simple structured response
@@ -51,6 +27,7 @@ type Response struct {
 var parser parsers.LineParser
 var parserType, timeFieldName, timeFieldFormat, env string
 
+// Handler takes a cloudwatch event and parses logs from it (sending them to honeycomb)
 func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 	if parser == nil {
 		return Response{
@@ -76,27 +53,27 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		}
 		// The JSON parser returns a map[string]interface{} - we need to convert it
 		// to a structure we can work with
-		payload, err := extractPayload(parsedLine)
+		payload, err := common.ExtractPayload(parsedLine)
 		if err != nil {
 			logrus.WithError(err).WithField("line", event.Message).
 				Warn("unable to get event payload from line, skipping")
 		}
 		hnyEvent := libhoney.NewEvent()
 		// add the actual event data
-		hnyEvent.Add(payload.data)
+		hnyEvent.Add(payload.Data)
 		// Include the logstream that this data came from to make it easier to find the source
 		// in Cloudwatch
 		hnyEvent.AddField("aws.cloudwatch.logstream", data.LogStream)
 
 		// If we have sane values for other fields, set those as well
-		if !payload.time.IsZero() {
-			hnyEvent.Timestamp = payload.time
+		if !payload.Time.IsZero() {
+			hnyEvent.Timestamp = payload.Time
 		}
-		if payload.dataset != "" {
-			hnyEvent.Dataset = payload.dataset
+		if payload.Dataset != "" {
+			hnyEvent.Dataset = payload.Dataset
 		}
-		if payload.sampleRate > 0 {
-			hnyEvent.SampleRate = payload.sampleRate
+		if payload.SampleRate > 0 {
+			hnyEvent.SampleRate = payload.SampleRate
 		}
 
 		// We don't sample here - we assume it has been done upstream by
@@ -110,24 +87,4 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		Ok:      true,
 		Message: "ok",
 	}, nil
-}
-
-func main() {
-	var err error
-	if err = common.InitHoneycombFromEnvVars(); err != nil {
-		logrus.WithError(err).
-			Fatal("Unable to initialize libhoney with the supplied environment variables")
-		return
-	}
-	defer libhoney.Close()
-
-	parser, err = common.ConstructParser("json")
-	if err != nil {
-		logrus.WithError(err).WithField("parser_type", parserType).
-			Fatal("unable to construct parser")
-		return
-	}
-	common.AddUserAgentMetadata("publisher", "json")
-
-	lambda.Start(Handler)
 }
