@@ -74,7 +74,13 @@ func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEve
 			}
 
 			hnyEvent := libhoney.NewEvent()
-			hnyEvent.Add(payload.Data)
+
+			err = hnyEvent.Add(payload.Data)
+			if err != nil {
+				logrus.WithError(err).
+					Warn("unable to add data to the event")
+			}
+
 			hnyEvent.AddField("aws.cloudwatch.loggroup", msg.LogGroup)
 
 			// If we have sane values for other fields, set those as well
@@ -91,7 +97,11 @@ func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEve
 
 			// We don't sample here - we assume it has been done upstream by
 			// whatever wrote to the log
-			hnyEvent.SendPresampled()
+			err = hnyEvent.SendPresampled()
+			if err != nil {
+				logrus.WithError(err).
+					Warn("unable to send the presampled event to honeycomb")
+			}
 
 		}
 
