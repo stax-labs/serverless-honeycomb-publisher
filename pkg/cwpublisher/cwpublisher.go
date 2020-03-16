@@ -2,21 +2,12 @@ package cwpublisher
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/honeycombio/honeytail/parsers"
 	"github.com/honeycombio/libhoney-go"
 	"github.com/sirupsen/logrus"
 	"github.com/stax-labs/serverless-honeycomb-publisher/pkg/common"
 )
-
-type payload struct {
-	time       time.Time
-	sampleRate uint
-	dataset    string
-	data       interface{}
-}
 
 // Response is a simple structured response
 type Response struct {
@@ -24,17 +15,17 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-var parser parsers.LineParser
-var parserType, timeFieldName, timeFieldFormat, env string
-
 // Handler takes a cloudwatch event and parses logs from it (sending them to honeycomb)
 func Handler(request events.CloudwatchLogsEvent) (Response, error) {
-	if parser == nil {
+
+	parser, err := common.ConstructParser("json")
+	if err != nil {
 		return Response{
 			Ok:      false,
 			Message: "parser not initialized, cannot process events",
 		}, fmt.Errorf("parser not initialized, cannot process events")
 	}
+	common.AddUserAgentMetadata("publisher", "json")
 
 	data, err := request.AWSLogs.Parse()
 	if err != nil {
@@ -60,7 +51,12 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		}
 		hnyEvent := libhoney.NewEvent()
 		// add the actual event data
-		hnyEvent.Add(payload.Data)
+		err = hnyEvent.Add(payload.Data)
+		if err != nil {
+			logrus.WithError(err).
+				Warn("unable to add data to the event")
+		}
+
 		// Include the logstream that this data came from to make it easier to find the source
 		// in Cloudwatch
 		hnyEvent.AddField("aws.cloudwatch.logstream", data.LogStream)
@@ -78,7 +74,12 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 
 		// We don't sample here - we assume it has been done upstream by
 		// whatever wrote to the log
-		hnyEvent.SendPresampled()
+		err = hnyEvent.SendPresampled()
+		if err != nil {
+			logrus.WithError(err).
+				Warn("unable to send the presampled event to honeycomb")
+		}
+
 	}
 
 	libhoney.Flush()
