@@ -4,6 +4,7 @@ export APP=honeycomb-publisher
 export ROOT_DIR=$(pwd)
 export HONEYCOMB_WRITE_KEY
 
+GOLANGCI_VERSION = 1.23.6
 PACKAGE_BUCKET ?= serverless-honeycomb-publisher-$(AWS_REGION)
 
 test:
@@ -16,6 +17,18 @@ clean:
 	$(info [+] Cleanup dist folder")
 	@rm -rf dist
 .PHONY: clean
+
+bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
+	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint 
+	
+bin/golangci-lint-${GOLANGCI_VERSION}:
+	@curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
+	@mv bin/golangci-lint $@
+
+lint: bin/golangci-lint
+	@echo "--- lint all the things"
+	@bin/golangci-lint run
+.PHONY: lint
 
 validate-template:
 	$(info [+] Validating cloudformation")
