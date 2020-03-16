@@ -99,12 +99,17 @@ func InitHoneycombFromEnvVars() error {
 	libhoney.UserAgentAddition = fmt.Sprintf("integrations-for-aws/%s", version)
 
 	// Call Init to configure libhoney
-	libhoney.Init(libhoney.Config{
+	err := libhoney.Init(libhoney.Config{
 		WriteKey:   writeKey,
 		Dataset:    dataset,
 		APIHost:    apiHost,
 		SampleRate: sampleRate,
 	})
+	if err != nil {
+		logrus.WithError(err).
+			Error("unable to initialise libhoney")
+		return fmt.Errorf("unable to initialise libhoney")
+	}
 
 	return nil
 }
@@ -167,8 +172,16 @@ func WriteErrorEvent(err error, errorType string, fields map[string]interface{})
 		ev.Dataset = errorDataset
 		ev.AddField("meta.honeycomb_error", err.Error())
 		ev.AddField("meta.error_type", errorType)
-		ev.Add(fields)
-		ev.Send()
+
+		err = ev.Add(fields)
+		if err != nil {
+			logrus.WithError(err).Error("unable to add fields to event")
+		}
+
+		err = ev.Send()
+		if err != nil {
+			logrus.WithError(err).Error("unable to send the error event")
+		}
 	}
 }
 
