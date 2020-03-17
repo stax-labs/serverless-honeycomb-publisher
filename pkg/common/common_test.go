@@ -64,7 +64,7 @@ func TestGetMatchString(t *testing.T) {
 		t.Error("GetMatchString should return a blank string")
 	}
 
-	os.Setenv("HONEYCOMB_EVENT_MATCH_STRINGS", "libhoney")
+	os.Setenv("HONEYCOMB_EVENT_MATCH_STRING", "libhoney")
 
 	matchString = GetMatchString()
 	if matchString != "libhoney" {

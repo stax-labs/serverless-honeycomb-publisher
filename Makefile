@@ -24,7 +24,7 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 	@mv bin/golangci-lint $@
 
 lint: bin/golangci-lint
-	@echo "--- lint all the things"
+	$(info [+] Linting")
 	@bin/golangci-lint run
 .PHONY: lint
 

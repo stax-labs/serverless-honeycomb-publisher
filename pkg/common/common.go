@@ -244,7 +244,7 @@ func GetMatchString() string {
 		return matchString
 	}
 
-	matchString := os.Getenv("HONEYCOMB_EVENT_MATCH_STRINGS")
+	matchString := os.Getenv("HONEYCOMB_EVENT_MATCH_STRING")
 
 	return matchString
 }
