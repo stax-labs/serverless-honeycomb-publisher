@@ -8,9 +8,7 @@ GOLANGCI_VERSION = 1.23.6
 PACKAGE_BUCKET ?= serverless-honeycomb-publisher-$(AWS_REGION)
 
 test:
-	@go test -v -cover ./pkg/cwpublisher
-	@go test -v -cover ./pkg/kpublisher
-	@go test -v -cover ./pkg/common
+	@go test -v -cover ./...
 .PHONY: test
 
 clean:
