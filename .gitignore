@@ -1,3 +1,4 @@
-pkg
 dist
 publisher/publisher
+.vscode
+bin

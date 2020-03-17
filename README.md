@@ -22,11 +22,16 @@ Then we figured if we were going to maintain this for ourselves, why not share i
 
 ![Simple Publishing Diagram](https://github.com/stax-labs/serverless-honeycomb-publisher/raw/master/images/simple-publishing-diagram.png)
 
-This also allows us to extend upon the functionality in the Publisher.
+This also allows us to extend upon the functionality in the Publisher such as:
+
+* auto creation of log groups if they don't exist so subscriptions will *always work
+* :rocket: kinesis as a data source!
 
 ## Usage
 
 You can use this from any region or AWS Account using the follow resource in your template:
+
+### Cloudwatch Logs Example
 
 **yaml**
 ```yaml
@@ -64,6 +69,11 @@ HoneycombPublisher:
 }
 ```
 
+### Cloudwatch Logs Subscription Parameters
+
+* SourceType = CloudWatchLogs (default)
+* LogGroupName = Log group to create and/or subscribe to
+
 Optionally you can specify up to five additional log groups:
 * LogGroupName1
 * LogGroupName2
@@ -71,7 +81,54 @@ Optionally you can specify up to five additional log groups:
 * LogGroupName4
 * LogGroupName5
 
-As well as the KMS KeyID for decrpytion of your token:
+### Kinesis Consumer Example
+
+**yaml**
+```yaml
+HoneycombPublisher:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+    Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher
+        SemanticVersion: 1.0.0
+    Parameters:
+        HoneycombWriteKey: <YOURKEY>
+        HoneycombDataset: <YOURDATASET>
+        KinesisStringMatch: "libhoney"
+        SourceType: Kinesis
+        KinesisStreamArn: <STREAMARN>
+```
+
+**json**
+```json
+{
+    "HoneycombPublisher": {
+    "Type": "AWS::Serverless::Application",
+        "Properties": {
+            "Location": {
+                "ApplicationId": "arn:aws:serverlessrepo:us-east-1:541595141780:applications/serverless-agentless-honeycomb-publisher",
+                "SemanticVersion": "1.0.0"
+            },
+            "Parameters": {
+                "HoneycombDataset": "<YOURDATASET>",
+                "HoneycombWriteKey": "<YOURWRITEKEY>",
+                "KinesisStringMatch": "libhoney",
+                "SourceType": "kinesis",
+                "KinesisStreamArn": "<STREAMARN>"
+            }
+        }
+    }
+}
+```
+### Kinesis Consumer Parameters
+
+* SourceType = Kinesis
+* KinesisStreamArn = ARN of the kinesis stream to subscribe to
+* KinesisStringMatch = string to check against events to deterrmine if they are HC events
+
+### General Parameters (Optional)
+
+The KMS KeyID for decrpytion of your token:
 * KMSKeyId
 
 And the Honeycomb API Host:

@@ -1,10 +1,9 @@
-package main
+package cwlogcreator
 
 import (
 	"context"
 
 	"github.com/aws/aws-lambda-go/cfn"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,11 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-// createLogGroupResource this lambda will try to create a log group and if it exists just pass through success
+// CreateLogGroupResource this lambda will try to create a log group and if it exists just pass through success
 //
 // This function requires a LogGroupName to be present in the properties passed in the event.
 //
-func createLogGroupResource(ctx context.Context, event cfn.Event) (string, map[string]interface{}, error) {
+func CreateLogGroupResource(ctx context.Context, event cfn.Event) (string, map[string]interface{}, error) {
 
 	logGroupName, ok := event.ResourceProperties["LogGroupName"].(string)
 	if !ok {
@@ -44,8 +43,4 @@ func createLogGroupResource(ctx context.Context, event cfn.Event) (string, map[s
 	}
 
 	return "", data, nil
-}
-
-func main() {
-	lambda.Start(cfn.LambdaWrap(createLogGroupResource))
 }

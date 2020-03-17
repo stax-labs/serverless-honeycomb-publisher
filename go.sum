@@ -19,8 +19,12 @@ github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 h1:E2s37DuLxFhQD
 github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870/go.mod h1:5tD+neXqOorC30/tWg0LCSkrqj/AR6gu8yY8/fpw1q0=
 github.com/go-sql-driver/mysql v1.4.1 h1:g24URVg0OFbNUTx9qqY1IRZ9D9z3iPyi5zKhQZpNwpA=
 github.com/go-sql-driver/mysql v1.4.1/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
+github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
+github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/honeycombio/agentless-integrations-for-aws v1.7.0 h1:wRm954b3EbQeU7hkvkpgjrgRpaFBuK7vYws8C/Ym3v4=
 github.com/honeycombio/agentless-integrations-for-aws v1.7.0/go.mod h1:Pn1K3XEOwnLhqEQSrlZJpAx+3PvP/Ro0xXE0bqXw2bs=
+github.com/honeycombio/beeline-go v0.4.11 h1:/VngeZrEuZyv4uRPCAAoOcz2Z2ZM4EQzSR1Wz2wpD20=
+github.com/honeycombio/beeline-go v0.4.11/go.mod h1:xZNfHCpYQFjVS4Xuc8eMKhBclLnW/PvBz5L1Dwcp81Y=
 github.com/honeycombio/honeytail v1.0.0 h1:aNIyoB5vLSICL4Qv68upZFid95JYlIaHoyX4BF2318s=
 github.com/honeycombio/honeytail v1.0.0/go.mod h1:MY/vbQjeFBUicmwkKq7wf8JzNSlmSCEYu5/+K63dcFQ=
 github.com/honeycombio/libhoney-go v1.9.3 h1:TkRO5m3IMghESG3LJW44ZL2VWxbNB7cNyGxSWMuKlWI=
@@ -44,6 +48,8 @@ github.com/sirupsen/logrus v1.4.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPx
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/versent/kinesis-tail v1.2.2 h1:igzMnEZkJQj4JdqjJO0IO5I0ao2I5I+MwIts2s+ORxo=
+github.com/versent/kinesis-tail v1.2.2/go.mod h1:Mxfbbau6DLI2QSrGJiEqweN//9zNp03CvyM9m3AtAMk=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793 h1:u+LnwYTOOW7Ukr/fppxEb1Nwz0AtPflrblfvUudpo+I=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2 h1:VklqNMn3ovrHsnt90PveolxSbWFaJdECFbxSq0Mqo2M=
