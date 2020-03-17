@@ -9,7 +9,7 @@ import (
 	"github.com/honeycombio/libhoney-go"
 	"github.com/sirupsen/logrus"
 	"github.com/stax-labs/serverless-honeycomb-publisher/pkg/common"
-	"github.com/versent/kinesis-tail/pkg/logdata"
+	"github.com/stax-labs/serverless-honeycomb-publisher/pkg/records"
 )
 
 // Response is a simple structured response
@@ -41,14 +41,11 @@ func New() (*Publisher, error) {
 // Handler takes a kinesis event and parses logs from it (sending them to honeycomb)
 func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEvent) (Response, error) {
 
-	includes := []string{"/"}
-	excludes := []string{}
-
 	for _, record := range kinesisEvent.Records {
 		kinesisRecord := record.Kinesis
 		dataBytes := kinesisRecord.Data
 
-		msgs, err := logdata.UncompressLogs(includes, excludes, &kinesisRecord.ApproximateArrivalTimestamp.Time, dataBytes)
+		msgs, err := records.UncompressLogs(&kinesisRecord.ApproximateArrivalTimestamp.Time, dataBytes)
 		if err != nil {
 			logrus.WithError(err).Warn("unable to uncompress logs")
 			continue
