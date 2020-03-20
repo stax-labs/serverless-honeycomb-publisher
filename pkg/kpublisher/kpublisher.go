@@ -68,6 +68,7 @@ func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEve
 			if err != nil {
 				logrus.WithError(err).WithField("line", parsedLine).
 					Warn("unable to get event payload from line, skipping")
+				continue
 			}
 
 			hnyEvent := libhoney.NewEvent()
@@ -76,6 +77,7 @@ func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEve
 			if err != nil {
 				logrus.WithError(err).
 					Warn("unable to add data to the event")
+				continue
 			}
 
 			hnyEvent.AddField("aws.cloudwatch.loggroup", msg.LogGroup)
@@ -98,6 +100,7 @@ func (pb *Publisher) Handler(ctx context.Context, kinesisEvent events.KinesisEve
 			if err != nil {
 				logrus.WithError(err).
 					Warn("unable to send the presampled event to honeycomb")
+				continue
 			}
 
 		}
