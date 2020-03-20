@@ -48,6 +48,7 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		if err != nil {
 			logrus.WithError(err).WithField("line", event.Message).
 				Warn("unable to get event payload from line, skipping")
+			continue
 		}
 		hnyEvent := libhoney.NewEvent()
 		// add the actual event data
@@ -55,6 +56,7 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		if err != nil {
 			logrus.WithError(err).
 				Warn("unable to add data to the event")
+			continue
 		}
 
 		// Include the logstream that this data came from to make it easier to find the source
@@ -78,6 +80,7 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		if err != nil {
 			logrus.WithError(err).
 				Warn("unable to send the presampled event to honeycomb")
+			continue
 		}
 
 	}
