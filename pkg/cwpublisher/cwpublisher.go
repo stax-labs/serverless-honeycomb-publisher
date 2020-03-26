@@ -35,6 +35,8 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		}, err
 	}
 
+	defer libhoney.Flush()
+
 	for _, event := range data.LogEvents {
 		parsedLine, err := parser.ParseLine(event.Message)
 		if err != nil {
@@ -84,8 +86,6 @@ func Handler(request events.CloudwatchLogsEvent) (Response, error) {
 		}
 
 	}
-
-	libhoney.Flush()
 
 	return Response{
 		Ok:      true,
