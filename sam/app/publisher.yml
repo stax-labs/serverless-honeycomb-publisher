@@ -294,13 +294,13 @@ Resources:
           DATASET: !Ref HoneycombDataset
           HONEYCOMB_EVENT_MATCH_STRING: !Ref KinesisStringMatch
       Handler: kpublisher
-      MemorySize: 128
+      MemorySize: 512
       Role:
         "Fn::GetAtt":
           - LambdaIAMRole
           - Arn
       Runtime: go1.x
-      Timeout: 10
+      Timeout: 30
       Events:
         CloudwatchKinesisStream:
           Type: Kinesis
