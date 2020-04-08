@@ -13,7 +13,7 @@ Metadata:
         - HoneycombAPIHost
         - HoneycombDataset
       - Label:
-          default: 'Log Groups to Monitor'
+          default: 'CloudWatch Log Groups to Monitor'
         Parameters:
         - LogGroupName
         - LogGroupName1
@@ -22,6 +22,18 @@ Metadata:
         - LogGroupName4
         - LogGroupName5
         - FilterPattern
+      - Label:
+          default: 'Kinesis Stream to Monitor'
+        Parameters:
+        - KinesisStreamArn
+        - KinesisStringMatch
+      - Label:
+          default: 'Publisher Configuration'
+        Parameters:
+        - SourceType
+        - PublisherLambdaTimeout
+        - PublisherLambdaMemory
+      
   'AWS::ServerlessRepo::Application':
     Name: serverless-agentless-honeycomb-publisher
     Description: >-
@@ -30,7 +42,7 @@ Metadata:
     SpdxLicenseId: Apache-2.0
     Labels: [honeycomb, sam, serverless, publisher, trace]
     HomePageUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
-    SemanticVersion: 1.2.1
+    SemanticVersion: 1.2.2
     SourceCodeUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
     LicenseUrl: ../../LICENSE
     ReadmeUrl: ../../README.md
@@ -42,6 +54,14 @@ Parameters:
     AllowedValues:
       - CloudWatchLogs
       - Kinesis
+  PublisherLambdaTimeout:
+    Type: Number
+    Default: 30
+  PublisherLambdaMemory:
+    Type: Number
+    MinValue: 128
+    MaxValue: 1024
+    Default: 128
   KinesisStreamArn:
     Type: String
     Default: ""
@@ -182,13 +202,13 @@ Resources:
           API_HOST: !Ref HoneycombAPIHost
           DATASET: !Ref HoneycombDataset
       Handler: cwpublisher
-      MemorySize: 128
+      MemorySize: !Ref PublisherLambdaMemory
       Role:
         "Fn::GetAtt":
           - LambdaIAMRole
           - Arn
       Runtime: go1.x
-      Timeout: 10
+      Timeout: !Ref PublisherLambdaTimeout
   ExecutePermission:
     Condition: IsCloudWatchLogs
     Type: "AWS::Lambda::Permission"
@@ -294,13 +314,13 @@ Resources:
           DATASET: !Ref HoneycombDataset
           HONEYCOMB_EVENT_MATCH_STRING: !Ref KinesisStringMatch
       Handler: kpublisher
-      MemorySize: 128
+      MemorySize: !Ref PublisherLambdaMemory
       Role:
         "Fn::GetAtt":
           - LambdaIAMRole
           - Arn
       Runtime: go1.x
-      Timeout: 10
+      Timeout: !Ref PublisherLambdaTimeout
       Events:
         CloudwatchKinesisStream:
           Type: Kinesis
