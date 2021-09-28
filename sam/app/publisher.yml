@@ -43,7 +43,7 @@ Metadata:
     SpdxLicenseId: Apache-2.0
     Labels: [honeycomb, sam, serverless, publisher, trace]
     HomePageUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
-    SemanticVersion: 1.2.2
+    SemanticVersion: 1.2.3
     SourceCodeUrl: https://github.com/stax-labs/serverless-honeycomb-publisher
     LicenseUrl: ../../LICENSE
     ReadmeUrl: ../../README.md
