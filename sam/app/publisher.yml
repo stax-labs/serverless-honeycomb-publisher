@@ -33,6 +33,7 @@ Metadata:
         - SourceType
         - PublisherLambdaTimeout
         - PublisherLambdaMemory
+        - PublisherLambdaParallelizationFactor
       
   'AWS::ServerlessRepo::Application':
     Name: serverless-agentless-honeycomb-publisher
@@ -62,6 +63,11 @@ Parameters:
     MinValue: 128
     MaxValue: 1024
     Default: 128
+  PublisherLambdaParallelizationFactor:
+    Type: Number
+    MinValue: 1
+    MaxValue: 10
+    Default: 1
   KinesisStreamArn:
     Type: String
     Default: ""
@@ -327,7 +333,7 @@ Resources:
           Properties:
             StartingPosition: "LATEST"
             Stream: !GetAtt HoneycombKinesisConsumer.ConsumerARN 
-
+            ParallelizationFactor: !Ref PublisherLambdaParallelizationFactor
 
   ######
   # Shared Resources
