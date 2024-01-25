@@ -25,29 +25,29 @@ test:
 .PHONY: test
 
 clean:
-	$(info [+] Cleanup dist folder")
+	$(info [+] Cleanup dist folder)
 	@rm -rf dist
 .PHONY: clean
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
-	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint 
-	
+	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
+
 bin/golangci-lint-${GOLANGCI_VERSION}:
-	@curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v$(GOLANGCI_VERSION)
 	@mv bin/golangci-lint $@
 
 lint: bin/golangci-lint
-	$(info [+] Linting")
-	@bin/golangci-lint run
+	$(info [+] Linting)
+	@bin/golangci-lint run --timeout 300s ./...
 .PHONY: lint
 
 validate-template:
-	$(info [+] Validating cloudformation")
+	$(info [+] Validating cloudformation)
 	aws cloudformation validate-template --template-body=file://sam/app/publisher.yml
 .PHONY: validate-template
 
 build:
-	$(info [+] Build Lambda Binaries")
+	$(info [+] Build Lambda Binaries)
 	@mkdir -p dist
 	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -a $(LDFLAGS) -o dist/cwlog-creator/bootstrap ./cmd/cwlog-creator
 	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -a $(LDFLAGS) -o dist/cwpublisher/bootstrap ./cmd/cwpublisher
@@ -55,13 +55,13 @@ build:
 .PHONY: build
 
 packagezip:
-	$(info [+] Package Binaries")
+	$(info [+] Package Binaries)
 	@zip -j -q dist/cwlog-creator.zip dist/cwlog-creator/bootstrap
 	@zip -j -q dist/cwpublisher.zip dist/cwpublisher/bootstrap
 	@zip -j -q dist/kpublisher.zip dist/kpublisher/bootstrap
 
 packagetest: packagezip
-	$(info [+] Prepare Testing Template")
+	$(info [+] Prepare Testing Template)
 	aws cloudformation package \
 		--template-file sam/testing/template.yml \
 		--s3-bucket $(PACKAGE_BUCKET) \
@@ -69,7 +69,7 @@ packagetest: packagezip
 .PHONY: packagetest
 
 deploytest:
-	$(info [+] Deploy Testing Publishers")
+	$(info [+] Deploy Testing Publishers)
 	@aws cloudformation deploy \
 		--template-file dist/test-packaged-template.yml \
 		--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
@@ -78,7 +78,7 @@ deploytest:
 .PHONY: deploytest
 
 package: packagezip
-	$(info [+] Prepare Template")
+	$(info [+] Prepare Template)
 	@aws cloudformation package \
 		--template-file sam/app/publisher.yml \
 		--s3-bucket $(PACKAGE_BUCKET) \
@@ -86,7 +86,7 @@ package: packagezip
 .PHONY: package
 
 deployci:
-	$(info [+] Deploy CI Pipeline")
+	$(info [+] Deploy CI Pipeline)
 	@aws cloudformation deploy \
 		--template-file sam/ci/template.yaml \
 		--capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
