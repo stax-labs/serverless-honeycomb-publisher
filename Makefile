@@ -4,8 +4,21 @@ export APP=honeycomb-publisher
 export ROOT_DIR=$(pwd)
 export HONEYCOMB_WRITE_KEY
 
-GOLANGCI_VERSION = 1.23.6
-PACKAGE_BUCKET ?= serverless-honeycomb-publisher-$(AWS_REGION)
+PACKAGE_BUCKET 		?= serverless-honeycomb-publisher-$(AWS_REGION)
+GIT_HASH    		?= $(shell git rev-parse --short HEAD)
+
+# Go related vars
+# ----------------------
+GOLANGCI_VERSION 	:= 1.55.2
+
+BUILD_OVERRIDES = \
+	-X "$(PACKAGE)/internal/app.Name=$(APP)" \
+	-X "$(PACKAGE)/internal/app.BuildDate=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+	-X "$(PACKAGE)/internal/app.Commit=$(GIT_HASH)" \
+# the -w -s flags make the binary a bit smaller and
+# trimpath shortens build paths in stack traces
+LDFLAGS := -ldflags='-w -s $(BUILD_OVERRIDES)' -trimpath
+export GOFLAGS=-buildvcs=false
 
 test:
 	@go test -v -cover ./...
@@ -36,14 +49,16 @@ validate-template:
 build:
 	$(info [+] Build Lambda Binaries")
 	@mkdir -p dist
-	@GOOS=linux GOARCH=amd64 go build -o dist/cwlog-creator ./cmd/cwlog-creator
-	@GOOS=linux GOARCH=amd64 go build -o dist/cwpublisher ./cmd/cwpublisher
-	@GOOS=linux GOARCH=amd64 go build -o dist/kpublisher ./cmd/kpublisher
+	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -a $(LDFLAGS) -o dist/cwlog-creator/bootstrap ./cmd/cwlog-creator
+	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -a $(LDFLAGS) -o dist/cwpublisher/bootstrap ./cmd/cwpublisher
+	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -a $(LDFLAGS) -o dist/kpublisher/bootstrap ./cmd/kpublisher
 .PHONY: build
 
 packagezip:
 	$(info [+] Package Binaries")
-	@cd dist && zip -X -9 -r ./handler.zip ./
+	@zip -j -q dist/cwlog-creator.zip dist/cwlog-creator/bootstrap
+	@zip -j -q dist/cwpublisher.zip dist/cwpublisher/bootstrap
+	@zip -j -q dist/kpublisher.zip dist/kpublisher/bootstrap
 
 packagetest: packagezip
 	$(info [+] Prepare Testing Template")

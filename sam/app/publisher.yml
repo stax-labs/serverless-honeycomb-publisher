@@ -138,9 +138,9 @@ Resources:
     Type: "AWS::Serverless::Function"
     Condition: IsCloudWatchLogs
     Properties:
-      CodeUri: '../../dist/handler.zip'
+      CodeUri: '../../dist/cwlog-creator.zip'
       Description: Lambda function for creating log groups from cloudformation
-      Handler: cwlog-creator
+      Handler: bootstrap
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -151,7 +151,9 @@ Resources:
                 - "logs:PutLogEvents"
               Resource: "arn:aws:logs:*:*:*"
       MemorySize: 128
-      Runtime: go1.x
+      Runtime: provided.al2
+      Architectures:
+        - arm64
       Timeout: 10
   LogGroupCreate:
     Condition: IsCloudWatchLogs
@@ -199,7 +201,7 @@ Resources:
     Condition: IsCloudWatchLogs
     Type: "AWS::Serverless::Function"
     Properties:
-      CodeUri: '../../dist/handler.zip'
+      CodeUri: '../../dist/cwpublisher.zip'
       Description: Lambda function for publishing asynchronous events from Lambda
       Environment:
         Variables:
@@ -207,13 +209,15 @@ Resources:
           KMS_KEY_ID: !Ref KMSKeyId
           API_HOST: !Ref HoneycombAPIHost
           DATASET: !Ref HoneycombDataset
-      Handler: cwpublisher
+      Handler: bootstrap
       MemorySize: !Ref PublisherLambdaMemory
       Role:
         "Fn::GetAtt":
           - LambdaIAMRole
           - Arn
-      Runtime: go1.x
+      Runtime: provided.al2
+      Architectures:
+        - arm64
       Timeout: !Ref PublisherLambdaTimeout
   ExecutePermission:
     Condition: IsCloudWatchLogs
@@ -310,7 +314,7 @@ Resources:
     Condition: IsKinesis
     DependsOn: LambdaKinesisPolicy
     Properties:
-      CodeUri: '../../dist/handler.zip'
+      CodeUri: '../../dist/kpublisher.zip'
       Description: Lambda function for publishing asynchronous events from Lambda
       Environment:
         Variables:
@@ -319,13 +323,15 @@ Resources:
           API_HOST: !Ref HoneycombAPIHost
           DATASET: !Ref HoneycombDataset
           HONEYCOMB_EVENT_MATCH_STRING: !Ref KinesisStringMatch
-      Handler: kpublisher
+      Handler: bootstrap
       MemorySize: !Ref PublisherLambdaMemory
       Role:
         "Fn::GetAtt":
           - LambdaIAMRole
           - Arn
-      Runtime: go1.x
+      Runtime: provided.al2
+      Architectures:
+        - arm64
       Timeout: !Ref PublisherLambdaTimeout
       Events:
         CloudwatchKinesisStream:
