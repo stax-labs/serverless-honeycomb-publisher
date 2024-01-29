@@ -3,8 +3,8 @@ module github.com/stax-labs/serverless-honeycomb-publisher
 go 1.21.6
 
 require (
-	github.com/aws/aws-lambda-go v1.45.0
-	github.com/aws/aws-sdk-go v1.50.3
+	github.com/aws/aws-lambda-go v1.46.0
+	github.com/aws/aws-sdk-go v1.50.6
 	github.com/honeycombio/beeline-go v1.14.0
 	github.com/honeycombio/honeytail v1.8.3
 	github.com/honeycombio/libhoney-go v1.20.0
